@@ -1,0 +1,304 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+|    _ _ _ _    |                                                              |
+| //         \\ | Creative Fields cfFLOW                                    |
+| |  cfFLOW  | |                                                              |
+| \\ _ _ _ _ // | Version: 1.2.0                                             |
+|               | Web: www.c-fields.com e-mail: support@c-fields.com           |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+version 2;
+format  ascii;
+class   dictionary;
+location    "system";
+object  meshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// FILE STRUCTURE
+// 
+// 1. Refinement
+// 1.1 Local Refinement
+// 1.2 Object Refinement
+// 1.3 Surface Mesh Refinement
+// 2. Boundary Layer Addition
+// 2.1 Layer Generation Optimisation
+// 
+// Marks are placed at each chapter 
+// To jump to a chapter search for c + chapter Number
+// e.g < ctrl + f> c13 for Surface Mesh Refinement
+// or /c13 <Enter> in vi
+
+
+// **** MANDATORY ENTRIES ****
+
+// path to surface file
+// relative from case or absolute
+surfaceFile "test.stl";// maximum cell size in the mesh (mandatory)
+
+// this is the size of the "background mesh"
+// equal to cell refinement level 0
+maxCellSize 0.5; // [m]
+
+// **** OPTIONAL ENTRIES ****
+
+// minimum cell size allowed 
+// in the automatic refiment procedure (optional
+// useful to prevent small cells
+minCellSize 0.05; // [m]
+
+// size of the cells at the boundary (optional)
+boundaryCellSize 0.25; // [m]
+
+// distance from the boundary at which
+// boundaryCellSize is applied
+boundaryCellSizeRefinementThickness 0.1; // [m]
+
+
+// Part 1: Refinement
+// mark: c1
+
+// refimentment zones at the surface
+// of the mesh (optional)
+localRefinement
+{
+    // patch name (as defined in surface input)
+    body
+    {
+        // additional refinement levels 
+        // to the max cell size
+        additionalRefinementLevels  5;
+        cellsize    0.0005;
+
+        // thickness of refinement region away from the patch
+        refinementThickness         0.2;
+    }
+}
+
+// Part 1.1: Object Refinement
+// mark: c11
+
+// refinement zones inside the mesh
+// based on primitive geometric objects (optional)
+objectRefinements
+{
+    refinementBox1
+    {
+        type        box;
+        centre      (-2 0 0);
+        lengthX     2;
+        lengthY     1;
+        lengthZ     1;
+        // cellSize will determine the size of cells
+        // within the box
+        // additionalRefinementLevels is still necessary
+        cellSize    0.04;
+        additionalRefinementLevels 3;
+    }
+
+    refinementCone1
+    {
+        type        cone;
+        p0          (2 0 0);
+        p1          (0 0 0);
+        radius0     0.2;
+        radius1     1.2;
+        cellSize    0.1;
+    }
+
+    refinementSphere
+    {
+        type        sphere;
+        centre      (0 0 0);
+        radius      2; 
+        cellSize    0.1;
+        refinementThickness 1;
+    }
+
+    wakeLine1
+    {
+        type        line;
+        p0          (-8 0 0);
+        p1          (5 0 0);
+        radius      2;
+        refinementThickness         0.8;
+        cellSize                    0.04;
+        additionalRefinementLevels  3;
+    }
+}
+
+// Part 1.2: Surface Refinement
+// mark: c12
+
+// refine regions intersected by surface meshes (optional)
+surfaceMeshRefinement
+{
+    hull
+    {
+        surfaceFile     "constant/triSurface/Autosub.stl" 
+        refinementThickness 0.05;
+        cellSize 0.02;
+    }
+}
+
+// Keep cells in the template that are intersecting
+// geometry features
+// set 0 to disable and 1 to enable
+keepCellsIntersectingBoundary   0;
+
+// remove cells where distinct parts of the mesh are joined 
+// together (optional)
+// active only when keepCellsIntersectingBoundary is active
+checkForGluedMesh       0;
+
+// keep cells in the mesh template that intersect
+// patches/subsets defined by the user
+keepCellsIntersectedPatches
+{
+    // patch name
+    "patch1.*" // accepts regex (as any patchname)
+    {
+        keepCells   1; // 0 inactive 1 active 
+    }
+}
+
+// removeCellsIntersectedPatches removes cells 
+// in the template in sections 
+// specified by the user
+// active only when keepCellsIntersectedPatches is active
+removeCellsIntersectedPatches
+{
+    // patch name
+    body
+    {
+        keepCells   0; 
+    }
+}
+ 
+enforceGeometryConstraints  0;
+
+// Part 1.3: Anisotropic Refinement
+//           a.k.a. cell growth
+// mark: c13
+
+anisotropicSources
+{
+    boxExample
+    {
+        type        box;
+        centre      (-5 0 0);
+        lengthX     5;
+        lengthY     5;
+        lengthZ     5;
+
+        // scaling factors in each direction
+        scaleX      1;
+        scaleY      0.3;
+        scaleZ      1;
+    }
+
+    planeExample
+    {
+        type        plane;
+        normal      (0 0 1);
+        origin      (0 0 0); 
+
+        // Scaling is applied in the positive normal direction
+        scalingDistance     5;
+        
+        // Scaling factor
+        scalingFactor       0.5;
+    }
+}
+
+
+// Part 2: Layer Generation
+// mark: c2
+
+// settings for boundary layers
+boundaryLayers
+{
+    // * global options for all boundary layers *
+
+    // number of layers (optional)
+    // mind that this will be applied to all boundaries
+    // including inlet, outlet etc
+    nLayers             10;
+
+    // Optimise Layer addition
+    // Set 1 to activate, 0 to deactivate
+    // See optimisationParameters below
+    optimiseLayer   1;
+
+    // Untangling of boundary layers
+    // Works on negative volume cells created 
+    // during layer addition
+    // Activate 1 or deactivate 0
+    // Default value is 1
+    untangleLayers  1;
+
+
+    // Thicknessratio (optional)
+    // Also known as growth factors
+    thicknessRatio  1.1;
+
+    // No idea what this does, but it's a thing
+    symmetryPlaneLayerTopology  1;
+
+    patchBoundaryLayers
+    {
+        body
+        {
+            nLayers             10;
+
+            // Max thickness of the first layer
+            // Ensure certain y+ (optional)
+            maxFirstLayerThickness 0.001; // [m] optional
+
+            thicknessRatio      1.1;
+        }
+    }
+
+    // Part 2.1: Layer Generation Optimisation
+    // mark: c21
+
+    // * global optimisation Parameters for layer addition
+    optimisationParameters
+    {
+        // number of iterations in the procedure for 
+        // redciting normal vectors 
+        // in the boundary layer (optional)
+        // Default value is 5
+        nSmoothNormals      5;
+
+
+        // number of iterations of the smoothing procedure
+        // optional
+        // Default value is 5
+        maxNumIterations    10;
+
+        // Ratio between the maximum allowed layer thickness
+        // and the estimated feature size
+        // Used to limit layer thickness in regions
+        // dominated by curvature (optional)
+        // Value ranges between 0 and 1
+        // Default value is 0.3
+        featureSizeFactor   0.3;
+
+        // activate 1 or deactivate 0 calculation of normals
+        // (optional)
+        reCalculateNormals  1;
+
+        // Controls the maximum difference of the 
+        // layer thickness between two neighbouring points
+        // divided by the distance of the points
+        // lower values enforce uniform thickness distribution
+        relThicknessTol     0.1;
+
+        // active 1 or inactive 0
+        // No idea why you would ever set this to 1
+        allowDiscontinuity  0;
+    }
+}
+
+
