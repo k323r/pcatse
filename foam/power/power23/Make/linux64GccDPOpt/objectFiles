@@ -1,0 +1,3 @@
+OBJECTS = \
+$(OBJECTS_DIR)/power.o\
+$(OBJECTS_DIR)/powerFunctionObject.o

@@ -1,0 +1,103 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+
+    {
+        name    inletCells;
+        type    cellSet;
+        action  new;
+        source  boxToCell;
+        sourceInfo
+        {
+            box (-0.1 -0.1 -0.1) (0.05 2.1 2.81);
+        }
+    }
+
+    {
+        name    inletFaces;
+        type    faceSet;
+        action  new;
+        source  cellToFace;
+		sourceInfo
+		{
+			set inletCells;
+			option all;
+		}
+    }
+
+	{
+		name 	inletFaces;
+		type	faceSet;
+		action	subset;
+		source	boundaryToFace;
+		sourceInfo
+		{
+		}
+	}
+
+	{
+		name	inletFaces;
+		type	faceSet;
+		action	delete;
+		source	normalToFace;
+		sourceInfo
+		{
+			normal (0 1 0);
+			cos 0.9;	
+		}
+	}
+	
+	{
+		name	inletFaces;
+		type	faceSet;
+		action	delete;
+		source	normalToFace;
+		sourceInfo
+		{
+			normal (0 -1 0);
+			cos 0.9;	
+		}
+	}
+
+	{
+		name	inletFaces;
+		type	faceSet;
+		action	delete;
+		source	normalToFace;
+		sourceInfo
+		{
+			normal (0 0 1);
+			cos 0.01;	
+		}
+	}
+
+	{
+		name	inletFaces;
+		type	faceSet;
+		action	delete;
+		source	normalToFace;
+		sourceInfo
+		{
+			normal (0 0 -1);
+			cos 0.01;	
+		}
+	}
+);
+
+// ************************************************************************* //

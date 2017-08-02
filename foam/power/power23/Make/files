@@ -1,0 +1,4 @@
+power/power.C
+power/powerFunctionObject.C
+
+LIB = $(FOAM_USER_LIBBIN)/libpower

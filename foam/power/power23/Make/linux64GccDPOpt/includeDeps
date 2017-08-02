@@ -1,0 +1,2 @@
+include power/power.dep
+include power/powerFunctionObject.dep

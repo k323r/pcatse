@@ -1,0 +1,61 @@
+# 1 "files"
+# 1 "<eingebaut>"
+# 1 "<Kommandozeile>"
+
+
+# 1 "/usr/include/stdc-predef.h" 1 3 4
+
+# 17 "/usr/include/stdc-predef.h" 3 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 2 "<Kommandozeile>" 2
+# 1 "files"
+power/power.C
+power/powerFunctionObject.C
+
+LIB = $(FOAM_USER_LIBBIN)/libpower

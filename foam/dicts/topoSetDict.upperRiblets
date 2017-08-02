@@ -1,0 +1,85 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+
+	// create a cell set containing the riblets
+    {
+        name    upperRibletCells;
+        type    cellSet;
+        action  new;
+        source  boxToCell;
+        sourceInfo
+        {
+            box (-0.1 1.957 -0.1) (6.1 2.1 2.81);
+        }
+    }
+
+	// extract only the faces
+    {
+        name    upperRibletFaces;
+        type    faceSet;
+        action  new;
+        source  cellToFace;
+		sourceInfo
+		{
+			set upperRibletCells;
+			option all;
+		}
+    }
+
+	// extract only the boundary faces
+	{
+		name 	upperRibletFaces;
+		type	faceSet;
+		action	subset;
+		source	boundaryToFace;
+		sourceInfo
+		{
+		}
+	}
+
+	// delete faces belonging to the inlet
+	{
+		name	upperRibletFaces;
+		type	faceSet;
+		action	delete;
+		source	normalToFace;
+		sourceInfo
+		{
+			normal (1 0 0);
+			cos 0.01;	
+		}
+	}
+
+	// delete faces belongign to the outlet
+	{
+		name	upperRibletFaces;
+		type	faceSet;
+		action	delete;
+		source	normalToFace;
+		sourceInfo
+		{
+			normal (-1 0 0);
+			cos 0.01;	
+		}
+	}
+
+);
+
+// ************************************************************************* //

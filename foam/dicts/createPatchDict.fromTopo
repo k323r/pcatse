@@ -1,0 +1,120 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      createPatchDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+pointSync false;
+
+patches
+(
+    {
+        // Name of new patch
+        name lowerRibletWall;
+       
+	 	// Type of new patch
+        patchInfo
+        {
+            type wall;
+        }
+
+        // How to construct: either from 'patches' or 'set'
+        constructFrom set;
+
+        set lowerRibletFaces;
+    }
+
+    {
+        // Name of new patch
+        name upperRibletWall;
+        
+		// Type of new patch
+        patchInfo
+        {
+            type wall;
+        }
+
+        // How to construct: either from 'patches' or 'set'
+        constructFrom set;
+
+        set upperRibletFaces;
+    }
+
+    {
+        // Name of new patch
+        name inlet;
+        
+		// Type of new patch
+        patchInfo
+        {
+            type patch;
+        }
+
+        // How to construct: either from 'patches' or 'set'
+        constructFrom set;
+
+        set inletFaces;
+    }
+
+	{
+        // Name of new patch
+        name outlet;
+        
+		// Type of new patch
+        patchInfo
+        {
+            type patch;
+        }
+
+        // How to construct: either from 'patches' or 'set'
+        constructFrom set;
+
+        set outletFaces;
+    }
+
+	{
+        // Name of new patch
+        name leftCyclic;
+        
+		// Type of new patch
+        patchInfo
+        {
+            type cyclic;
+			neighbourPatch rightCyclic;
+        }
+
+        // How to construct: either from 'patches' or 'set'
+        constructFrom set;
+
+        set leftFaces;
+    }
+
+	{
+        // Name of new patch
+        name rightCyclic;
+        
+		// Type of new patch
+        patchInfo
+        {
+            type cyclic;
+			neighbourPatch leftCyclic;
+        }
+
+        // How to construct: either from 'patches' or 'set'
+        constructFrom set;
+
+        set rightFaces;
+    }
+);
+
+// ************************************************************************* //
