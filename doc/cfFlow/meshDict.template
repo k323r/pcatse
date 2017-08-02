@@ -211,6 +211,21 @@ anisotropicSources
     }
 }
 
+// refine Regions intersected by edge meshes (optional)
+// Workflow:
+// 1. run surfaceFeatureExtract on sample.stl
+// 2. run surfaceFeatureConvert sample.eMesh sample.vtk
+// 3. insert edgeFile path to sample.vtk
+edgeMeshRefinement
+{
+    edges
+    {
+        edgeFile "example.vtk";
+
+        cellSize    0.005;
+        refinementThickness 0.05;
+    }
+}
 
 // Part 2: Layer Generation
 // mark: c2
@@ -299,6 +314,48 @@ boundaryLayers
         // No idea why you would ever set this to 1
         allowDiscontinuity  0;
     }
+
+// *** Patch naming ***
+// This will happen AFTER everything else was done!
+renameBoundary
+{
+    // new name of all patches except the ones specified below
+    defaultName     sides;
+
+    // new type of the default patch
+    // (optional)
+    defaultType     patch;
+
+    // This is an example assuming that 
+    // surfaceGenerateBoundary
+    // was used
+    newPatchNames
+    {
+        // patch name in the surface mesh (stl, vtk ..)
+        xMin    // accepts regex
+        {
+            // new name in the volume mesh
+            newName     inlet;
+
+            // new type in the volume mesh (optional)
+            type        patch;
+        }
+
+        xMax
+        {
+            newName    outlet;
+            type        patch;
+        }
+
+        // patch name in the surface mesh 
+        body
+        {
+            newName     glider;
+            type        wall;
+        }
+    }
+
+}
 }
 
 
