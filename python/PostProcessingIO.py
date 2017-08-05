@@ -1,4 +1,6 @@
 import numpy as np
+from os.path import isfile
+import subprocess as sb
 # import matplotlib.pyplot as plt
 import math
 
@@ -27,23 +29,29 @@ def readLine(line):
         elements = line.split()
         if elements[0] == '#':
             return None
-        elements = [float(x) for x in elements]
+        if len(elements) > 1:
+            elements = [float(x) for x in elements]
+        else:
+            return float(elements[0])
     except:
         return None
 
-	print(len(elements))
     return elements
     
 
 def readFile(filepath):
-
-    filehandle = open(filepath, 'r')
     
+    try:
+        filehandle = open(filepath, 'r')
+    except (IOError, OSError) as e:
+        print ("could not open file: ", filepath)
+        print ("Exception: ", e)
+        
     raw = []
     
     for line in filehandle:
         data = readLine(line)
-        if data != None and len(data) > 0:
+        if data != None:
             raw.append(data)
     
     filehandle.close()
@@ -139,7 +147,7 @@ def fftAnalysis (time, data, printPeaks=True):
     
 # TODO es fehlt scalar probes und vector probes!
 # for probes
-def readProbesFile (file, start_time = 1, end_time = 10):
+def readProbesFile (filepath, start_time = 1, end_time = 10):
     raw = []
     probes = {}
 
@@ -147,9 +155,9 @@ def readProbesFile (file, start_time = 1, end_time = 10):
     y_c = []
 
     
-    file = open(file, 'r')
-    print("opened file", file)
-    for line in file:
+    f = open(filepath, 'r')
+    print("opened file", f)
+    for line in f:
         tmp = line.split()
         if len(tmp) <= 1:
             continue
@@ -164,8 +172,60 @@ def readProbesFile (file, start_time = 1, end_time = 10):
     
     print("length raw: ", len(raw))
     
+    f.close()    
+    
     return x_c, y_c, raw
         # else:
   
-    
+# FIX add tempfile support
+# FIX parse the output file in python (not grep and awk)  
+def extractPressureGradient(filepath):
+    if isfile(filepath):
+        extractTimeCommand = "cat " + str(filepath) + " | grep \"^Time\" | awk \'{print $3}\' > timeSteps"
+        extractPressureCommand = "cat " + str(filepath) + " | grep \"pressure gradient\" | awk \'{print $11}\' > rawPressureGradient"
+        
+        try:
+            print (extractTimeCommand)
+            sb.call(extractTimeCommand, shell = True)
+        except:
+            print ("could not execute extractTimeCommand")
+            print (extractTimeCommand)
+        try:
+            print (extractPressureCommand)
+            sb.call(extractPressureCommand, shell = True)
+        except:
+            print ("could not execeute extractPressureCommand")
+            print (extractPressureCommand)
+    else:
+        raise Exception("no such file or directory: ", filepath)
 
+    if isfile("./timeSteps") and isfile("./rawPressureGradient"):
+        
+        times = readFile("./timeSteps")
+        pressure = readFile("./rawPressureGradient")
+        
+        if (len(pressure) % len(times) != 0):
+            raise Exception("time steps and pressure gradient steps do not match")
+        
+        nPressurePerTime = len(pressure) / len(times)
+        averagedPressure = []        
+        
+        for i in np.arange(nPressurePerTime, len(pressure) + 1, nPressurePerTime):
+            averagedPressure.append(np.average(pressure[i-6:i]))
+
+        try:
+            fOut = open("pressureGradient", 'w')
+        except:
+            raise Exception("could not open out file")
+
+        fOut.writelines("# timestep aveargedPressureGradient")
+        for t, p in zip(times, averagedPressure):
+            fOut.writelines(str(t) + " " + str(p) + "\n")
+        
+        fOut.close()
+            
+        
+
+
+
+        
