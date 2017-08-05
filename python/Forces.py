@@ -6,9 +6,9 @@ Created on Wed Jul 26 17:52:18 2017
 """
 import numpy as np
 
-from postprocessing import readForceFile
-from postprocessing import fftAnalysis
-from postprocessing import getIndices
+from PostProcessinIO import readForceFile
+from PostProcessinIO import fftAnalysis
+from PostProcessinIO import getIndices
 
 class Forces:
     
