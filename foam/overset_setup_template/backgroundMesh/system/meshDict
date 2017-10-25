@@ -1,0 +1,309 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+|    _ _ _ _    |                                                              |
+| //         \\ | Creative Fields cfFLOW                                    |
+| |  cfFLOW  | |                                                              |
+| \\ _ _ _ _ // | Version: 1.2.0                                             |
+|               | Web: www.c-fields.com e-mail: support@c-fields.com           |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+version 2;
+format  ascii;
+class   dictionary;
+location    "system";
+object  meshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// FILE STRUCTURE
+// 
+// 1. Refinement
+// 1.1 Local Refinement
+// 1.2 Object Refinement
+// 1.3 Surface Mesh Refinement
+// 2. Boundary Layer Addition
+// 2.1 Layer Generation Optimisation
+// 
+// Marks are placed at each chapter 
+// To jump to a chapter search for c + chapter Number
+// e.g < ctrl + f> c13 for Surface Mesh Refinement
+// or /c13 <Enter> in vi
+
+
+// **** MANDATORY ENTRIES ****
+
+// path to surface file
+// relative from case or absolute
+
+surfaceFile "spheroid_w_boundary.stl";
+
+// maximum cell size in the mesh (mandatory)
+// this is the size of the "background mesh"
+// equal to cell refinement level 0
+maxCellSize 0.2; // [m]
+
+// **** OPTIONAL ENTRIES ****
+
+// minimum cell size allowed 
+// in the automatic refiment procedure (optional
+// useful to prevent small cells
+//minCellSize 0.05; // [m]
+
+// size of the cells at the boundary (optional)
+//boundaryCellSize 0.25; // [m]
+
+// distance from the boundary at which
+// boundaryCellSize is applied
+//boundaryCellSizeRefinementThickness 0.1; // [m]
+
+
+// Part 1: Refinement
+// mark: c1
+
+// refimentment zones at the surface
+// of the mesh (optional)
+localRefinement
+{
+    // patch name (as defined in surface input)
+    spheroid
+    {
+        // additional refinement levels 
+        // to the max cell size
+            additionalRefinementLevels  7;
+            cellsize    0.0001;
+
+            // thickness of refinement region away from the patch
+            refinementThickness         0.002;
+   }
+
+}
+
+
+// Part 1.1: Object Refinement
+// mark: c11
+
+// refinement zones inside the mesh
+// based on primitive geometric objects (optional)
+objectRefinements
+{
+/*    refinementBox1
+    {
+        type        box;
+        centre      (4 0 0);
+        lengthX     2;
+        lengthY     2;
+        lengthZ     0.5;
+        // cellSize will determine the size of cells
+        // within the box
+        // additionalRefinementLevels is still necessary
+        cellSize    0.25;
+        additionalRefinementLevels 3;
+    }*/
+
+    refinementCylinder
+    {
+        type        cone;
+        p0          (-0.3 0 0);
+        p1          (1 0 0); 
+        radius0     0.1;
+        radius1     0.1;
+        additionalRefinementLevels 5;
+    }
+
+}
+// Part 1.2: Surface Refinement
+// mark: c12
+
+
+// refine regions intersected by surface meshes (optional)
+surfaceMeshRefinement
+{
+    spheroidRefinement
+    {
+        surfaceFile     "prolate_8_1_spheroid.obj";
+        refinementThickness 0.2;
+        additionalRefinementLevels 5;
+    }
+}
+
+// Keep cells in the template that are intersecting
+// geometry features
+// set 0 to disable and 1 to enable
+keepCellsIntersectingBoundary   1;
+
+// remove cells where distinct parts of the mesh are joined 
+// together (optional)
+// active only when keepCellsIntersectingBoundary is active
+checkForGluedMesh       0;
+
+// keep cells in the mesh template that intersect
+// patches/subsets defined by the user
+keepCellsIntersectedPatches
+{
+    spheroid
+    {
+        keepCells   1; 
+    }
+}
+
+// removeCellsIntersectedPatches removes cells 
+// in the template in sections 
+// specified by the user
+// active only when keepCellsIntersectedPatches is active
+removeCellsIntersectedPatches
+{
+}
+ 
+enforceGeometryConstraints  0;
+
+// Part 1.3: Anisotropic Refinement
+//           a.k.a. cell growth
+// mark: c13
+
+anisotropicSources
+{
+}
+
+// refine Regions intersected by edge meshes (optional)
+edgeMeshRefinement
+{
+/*    edges
+    {
+        edgeFile "glider.vtk";
+
+        cellSize    0.005;
+        refinementThickness 0.05;
+    }*/
+}
+
+// Part 2: Layer Generation
+// mark: c2
+
+// settings for boundary layers
+boundaryLayers
+{
+    // * global options for all boundary layers *
+
+    // number of layers (optional)
+    // mind that this will be applied to all boundaries
+    // including inlet, outlet etc
+    nLayers             0;
+
+    // Optimise Layer addition
+    // Set 1 to activate, 0 to deactivate
+    // See optimisationParameters below
+    optimiseLayer   1;
+
+    // Untangling of boundary layers
+    // Works on negative volume cells created 
+    // during layer addition
+    // Activate 1 or deactivate 0
+    // Default value is 1
+    untangleLayers  1;
+
+
+    // Thicknessratio (optional)
+    // Also known as growth factors
+    thicknessRatio  1.1;
+
+    // No idea what this does, but it's a thing
+    symmetryPlaneLayerTopology  1;
+
+    patchBoundaryLayers
+    {
+        spheroid
+        {
+            nLayers             10;
+
+            // Max thickness of the first layer
+            // Ensure certain y+ (optional)
+            //maxFirstLayerThickness 0.001; // [m] optional
+
+            thicknessRatio      1.03;
+        }
+    }
+
+    // Part 2.1: Layer Generation Optimisation
+    // mark: c21
+
+    // * global optimisation Parameters for layer addition
+    optimisationParameters
+    {
+        // number of iterations in the procedure for 
+        // redciting normal vectors 
+        // in the boundary layer (optional)
+        // Default value is 5
+        nSmoothNormals      10;
+
+
+        // number of iterations of the smoothing procedure
+        // optional
+        // Default value is 5
+        maxNumIterations    20;
+
+        // Ratio between the maximum allowed layer thickness
+        // and the estimated feature size
+        // Used to limit layer thickness in regions
+        // dominated by curvature (optional)
+        // Value ranges between 0 and 1
+        // Default value is 0.3
+        featureSizeFactor   0.3;
+
+        // activate 1 or deactivate 0 calculation of normals
+        // (optional)
+        reCalculateNormals  1;
+
+        // Controls the maximum difference of the 
+        // layer thickness between two neighbouring points
+        // divided by the distance of the points
+        // lower values enforce uniform thickness distribution
+        relThicknessTol     0.02;
+
+        // active 1 or inactive 0
+        // No idea why you would ever set this to 1
+        allowDiscontinuity  0;
+    }
+}
+
+// *** Patch naming ***
+renameBoundary
+{
+    // new name of all patches except the ones specified below
+    defaultName     sides;
+
+    // new type of the default patch
+    // (optional)
+    defaultType     patch;
+
+    // This is an example assuming that 
+    // surfaceGenerateBoundary
+    // was used
+    newPatchNames
+    {
+        // patch name in the surface mesh (stl, vtk ..)
+        xMin    // accepts regex
+        {
+            // new name in the volume mesh
+            newName     inlet;
+
+            // new type in the volume mesh (optional)
+            type        patch;
+        }
+
+        xMax
+        {
+            newName    outlet;
+            type        patch;
+        }
+
+        // patch name of the
+        spheroid
+        {
+            newName     main;
+            type        wall;
+        }
+    }
+
+}
+
+

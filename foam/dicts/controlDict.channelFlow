@@ -1,0 +1,145 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     pimpleFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         500;
+
+deltaT          5e-3;
+
+writeControl    timeStep;
+
+writeInterval   20000;
+
+purgeWrite      50;
+
+writeFormat     binary;
+
+writePrecision  6;
+
+writeCompression on;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+functions
+{
+    Q1
+    {
+        type            Q;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+    }
+    vorticity1
+    {
+        type            vorticity;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+    }
+    yPlus
+    {
+        type            yPlus;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+    }
+    fieldAverage1
+    {
+        type            fieldAverage;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+        timeStart       100;
+
+        fields
+        (
+            U
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+
+            p
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+        );
+    }
+
+
+    forces_upper
+    {
+        type        forces;
+
+        functionObjectLibs ( "libforces.so" );
+
+        writeInterval   timeStep;
+        writeInterval    1;
+
+        log         yes;
+
+        patches     ( upperRibletWall );
+        pName       p;
+        UName       U;
+        rho         rhoInf;
+        log         true;
+        rhoInf      1;          // Redundant for incompressible
+
+        CofR        (0 0 0);    // Rotation around centre line of propeller
+        pitchAxis   (0 0 1);
+    }
+
+    forces_lower
+    {
+        type        forces;
+
+        functionObjectLibs ( "libforces.so" );
+
+        writeInterval   timeStep;
+        writeInterval    1;
+
+        log         yes;
+
+        patches     ( lowerRibletWall );
+        pName       p;
+        UName       U;
+        rho         rhoInf;
+        log         true;
+        rhoInf      1;          // Redundant for incompressible
+
+        CofR        (0 0 0);    // Rotation around centre line of propeller
+        pitchAxis   (0 0 1);
+    }
+
+	
+	#includeFunc probes
+    #includeFunc singleGraph
+//    #includeFunc surfaces
+}
+
+
+// ************************************************************************* //

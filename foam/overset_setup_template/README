@@ -1,0 +1,26 @@
+This template case was created to display a workflow
+that combines different foam utilities and cfMesh to 
+create an overset-case
+
+=================
+
+What to change to make this suitable for your own simulation
+
+1. Changes in backgroundMesh
+* adjust blockMeshDict
+* adjust snappyHexMeshDict (refinementBoxes and levels only)
+
+2. Changes in movingMesh
+* insert your geometry
+* (optional) run surfaceGenerateBoundaries to add a boundary case 
+  if you simulate an external flow
+* adjust the meshDict
+* (optional) change for another mesher, e.g. snappyHexMesh
+* adjust createCut.topoSet to modify the shape of the overset
+
+
+===================
+
+Problems:
+
+Check that any timesteps are deleted before starting the meshing process

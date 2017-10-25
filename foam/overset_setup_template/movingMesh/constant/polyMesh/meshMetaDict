@@ -1,0 +1,73 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant/polyMesh";
+    object      meshMetaDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+surfaceFile     "spheroid_w_boundary.stl";
+
+surfaceMeta
+{
+    nPoints         9351;
+    nFacets         18694;
+    nPatches        7;
+    nFeatureEdges   0;
+    patches
+    {
+        spheroid
+        {
+            type            empty;
+            nFacets         18682;
+        }
+        xMin
+        {
+            type            empty;
+            nFacets         2;
+        }
+        xMax
+        {
+            type            empty;
+            nFacets         2;
+        }
+        yMin
+        {
+            type            empty;
+            nFacets         2;
+        }
+        yMax
+        {
+            type            empty;
+            nFacets         2;
+        }
+        zMin
+        {
+            type            empty;
+            nFacets         2;
+        }
+        zMax
+        {
+            type            empty;
+            nFacets         2;
+        }
+    }
+    pointSubsets
+    {
+    }
+    facetSubsets
+    {
+    }
+    featureEdgeSubsets
+    {
+    }
+}

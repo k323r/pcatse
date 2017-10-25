@@ -1,1 +1,0 @@
-../power/powerFunctionObject.C

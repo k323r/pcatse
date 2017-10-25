@@ -1,0 +1,105 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    Phi
+    {
+        solver          GAMG;
+        smoother        DIC;
+        tolerance       1e-07;
+        relTol          0.01;
+    }
+
+   p
+   {
+        solver           GAMG;
+        tolerance        1e-07;
+        relTol           0.01;
+        smoother         DICGaussSeidel;
+    }
+
+    pFinal
+    {
+        $p;
+        tolerance        1e-08;
+        relTol           0;
+    }
+
+    "(U|kl|kt|omega)"
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-07;
+        relTol          0.1;
+    }
+
+    "(U|kl|kt|omega)Final"
+    {
+        $U;
+        tolerance       1e-08;
+        relTol          0;
+    }
+}
+
+potentialFlow
+{
+    nNonOrthogonalCorrectors 15;
+}
+
+PIMPLE
+{
+    nOuterCorrectors    2;
+    nCorrectors         2;
+    nNonOrthogonalCorrectors 5;
+}
+
+SIMPLE
+{
+	nNonOrthogonalCorrectors 5;
+
+
+    residualControl
+    {
+        p               1e-6;
+        U               1e-5;
+        "(kl|kt|omega)"   1e-5;
+    }
+
+}
+
+/*
+relaxationFactors
+{
+    fields
+    {
+        p               0.3;
+    }
+    equations
+    {
+	U		0.7;
+	UFinal		0.7;
+	"(kl|kt|omega)" 0.07;
+	"(kl|kt|omega)Final" 0.07;
+    }
+}
+*/
+cache
+{
+    grad(U);
+}
+
+// ************************************************************************* //

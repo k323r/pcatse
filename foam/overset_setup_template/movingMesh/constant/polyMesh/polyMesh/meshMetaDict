@@ -1,0 +1,123 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant/polyMesh";
+    object      meshMetaDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+surfaceFile     "spheroid_w_boundary.stl";
+
+surfaceMeta
+{
+    nPoints         9351;
+    nFacets         18694;
+    nPatches        7;
+    nFeatureEdges   0;
+    patches
+    {
+        zone0
+        {
+            type            empty;
+            nFacets         18682;
+        }
+        xMin
+        {
+            type            empty;
+            nFacets         2;
+        }
+        xMax
+        {
+            type            empty;
+            nFacets         2;
+        }
+        yMin
+        {
+            type            empty;
+            nFacets         2;
+        }
+        yMax
+        {
+            type            empty;
+            nFacets         2;
+        }
+        zMin
+        {
+            type            empty;
+            nFacets         2;
+        }
+        zMax
+        {
+            type            empty;
+            nFacets         2;
+        }
+        body
+        {
+            type            empty;
+            nFacets         64858;
+        }
+        outlet
+        {
+            type            empty;
+            nFacets         2;
+        }
+        inlet
+        {
+            type            empty;
+            nFacets         2;
+        }
+        back
+        {
+            type            empty;
+            nFacets         2;
+        }
+        front
+        {
+            type            empty;
+            nFacets         2;
+        }
+        bottom
+        {
+            type            empty;
+            nFacets         2;
+        }
+        top
+        {
+            type            empty;
+            nFacets         2;
+        }
+        MOTH_Glider_Design_v1-3_1_1_Hull(Meshed)
+        {
+            type            empty;
+            nFacets         55742;
+        }
+        glider
+        {
+            type            empty;
+            nFacets         55742;
+        }
+        spheroid
+        {
+            type            empty;
+            nFacets         18682;
+        }
+    }
+    pointSubsets
+    {
+    }
+    facetSubsets
+    {
+    }
+    featureEdgeSubsets
+    {
+    }
+}

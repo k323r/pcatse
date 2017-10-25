@@ -1,0 +1,19 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+runApplication foamCleanPolyMesh
+rm -r 0
+rm log.*
+
+# Create background mesh
+runApplication blockMesh
+
+# Create background mesh
+runApplication snappyHexMesh -overwrite
+
+# create inlets and outlets
+runApplication topoSet -dict system/createInletOutletSets.topoSetDict
+
+runApplication createPatch -overwrite -dict system/createInletOutlet.createPatchDict
+#------------------------------------------------------------------------------

@@ -1,0 +1,116 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  plus                                  |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+    // Create Cellzone within the AMI
+    // This is the sphere within the AMI patches
+    {
+        name    AMIcylinderCellSet;
+        type    cellSet;
+        action  new;
+        source  cylinderToCell;
+        sourceInfo
+        {
+            p1     	(0 0 0);
+            p2       	(0 0 1);
+            radius     	3;
+        }
+    }
+
+    // Create CellZone from cellSet above
+    {
+        name    AMIcylinderZone;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        sourceInfo
+        {
+            set     AMIcylinderCellSet;
+        }
+    }   
+
+
+    // Create Cellset for translation 
+    // This includes the cells within the baffles
+    {
+        name    translationBoxCellSet;
+        type    cellSet;
+        action  new;
+        source  boxToCell;
+        sourceInfo
+        {
+            box     (-20 -15 -1) (20 15 1);
+            //box     (-20 -5 -1) (20 5 1);
+        }
+    }
+
+    // Remove all cells from AMI cell set
+    // Cells cannot be in two cell zones!
+    {
+        name    translationBoxCellSet;
+        type    cellSet;
+        action  delete;
+        source  cellToCell;
+        sourceInfo
+        {
+	        set AMIcylinderCellSet;
+            name translationBoxCellSet;
+        }
+    }
+
+    // Create cellZone from reduced cellSet above 
+    {
+        name    translationboxZone;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        sourceInfo
+        {
+            set     translationBoxCellSet;
+        }
+    }
+
+    // Create faceZone(!!!) from a box
+    // Takes only intersecting faces
+    {
+        name    translationsurfaceZone;
+        type    faceZoneSet;
+        action  new;
+        source  searchableSurfaceToFaceZone;
+        sourceInfo
+        {
+           surface searchableBox;
+           min (-30 -15 -50);
+           max (30 15 50);
+        }
+    }
+
+    // Create a faceSet from faceZone (notice, this is the other way around)
+    // Used for baffles for displacement solver
+    {
+        name translationSurface;
+        type faceSet;
+        action new;
+        source  zoneToFace;
+        sourceInfo
+        {
+            name translationsurfaceZone;
+        }
+    }
+);
+
+// ************************************************************************* //

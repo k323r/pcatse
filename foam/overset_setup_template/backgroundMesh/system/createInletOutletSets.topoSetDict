@@ -1,0 +1,108 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  plus                                  |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+    {
+        name    boundaryFaces;
+        type    faceSet;
+        action  new;
+        source  boundaryToFace;
+        sourceInfo
+        {
+        }
+    }
+    {
+        name    outletFaces;
+        type    faceSet;
+        action  new;
+        source  faceToFace;
+        sourceInfo
+        {
+            set boundaryFaces;
+        }
+    }
+
+    {
+        name    inletFaces;
+        type    faceSet;
+        action  new;
+        source  faceToFace;
+        sourceInfo
+        {
+            set boundaryFaces;
+        }
+    }
+
+    {
+        name    sideFaces;
+        type    faceSet;
+        action  new;
+        source  faceToFace;
+        sourceInfo
+        {
+            set boundaryFaces;
+        }
+    }
+
+    {
+        name    outletFaces;
+        type    faceSet;
+        action  subset;
+        source  normalToFace;
+        sourceInfo
+        {
+            normal  (-1 0 0);   // Vector
+            cos     0.01;        // Tolerance (max cos of angle)
+        }
+    }
+
+    {
+        name    inletFaces;
+        type    faceSet;
+        action  subset;
+        source  normalToFace;
+        sourceInfo
+        {
+            normal  (1 0 0);    // Vector
+            cos     0.01;        // Tolerance (max cos of angle)
+        }
+    }
+    
+    {
+        name    sideFaces;
+        type    faceSet;
+        action  delete;
+        source  faceToFace;
+        sourceInfo
+        {
+            set outletFaces;
+        }
+    }
+    {
+        name    sideFaces;
+        type    faceSet;
+        action  delete;
+        source  faceToFace;
+        sourceInfo
+        {
+            set inletFaces;
+        }
+    }
+);
+
+// ************************************************************************* //
