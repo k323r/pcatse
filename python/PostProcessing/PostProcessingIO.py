@@ -131,7 +131,7 @@ def nextpow2 (i):
     return n
     
 ### runs a simple fft analysis on arbitrary data
-def fftAnalysis (time, data, printPeaks=True):
+def fftAnalysis (time, data, printPeaks=False):
 
     N = len(time)
    
@@ -150,7 +150,7 @@ def fftAnalysis (time, data, printPeaks=True):
     for i in range(0, N):
         filteredData.append((data[i] - average) * 0.5 * (1.0 - np.cos((2.0*np.pi*i) / (N - 1))))
 
-    fftDistribution = np.abs(np.fft.fft(filteredData))[0:N/2]
+    fftDistribution = np.abs(np.fft.fft(filteredData))[0:int(N/2)]
     peaks = [f[index] for index in fftDistribution.argsort()[-20:]]
     peakDistro = [fftDistribution[index] for index in fftDistribution.argsort()[-20:]]
 
