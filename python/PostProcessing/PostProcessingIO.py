@@ -6,6 +6,13 @@ from os import listdir
 # import matplotlib.pyplot as plt
 import math
 
+def isNumber(s):
+    try:
+        complex(s) # for int, long, float and complex
+    except ValueError:
+        return False
+    return True
+
 isTimeDir = re.compile(r'(^\d+\.?\d*$)')
 
 def getTimeDirs(path):
@@ -34,7 +41,7 @@ def getIndices(data, start = 0, end = 0):
         endIndex = 0
         while data[startIndex] < start: 
             startIndex += 1
-        while data[endIndex] < end: 
+        while data[endIndex] < end and endIndex < len(data)-1:
             endIndex += 1        
         return [int(startIndex), int(endIndex + 1)]
         
@@ -117,6 +124,41 @@ def readForceFile (filepath, startTime = 0.1, endTime = 10, rho = 1.0, u = 1.0, 
     filehandle.close()
     raw = np.array(raw)
     return np.array([ raw[:,0], ( raw[:,1]  / (0.5 * rho * u**2 * A )), (raw[:,2]  / (0.5 * rho * u**2 * A )), (raw[:,3]  / (0.5 * rho * u**2 * A )), (raw[:,4]  / (0.5 * rho * u**2 * A )), (raw[:,5]  / (0.5 * rho * u**2 * A )),(raw[:,6]  / (0.5 * rho * u**2 * A )) ])
+
+
+def readForceFile2 (filepath, startTime = 0, endTime = 0):
+    raw = []
+
+    with open(filepath, 'r') as filehandle:
+        for line in filehandle:
+            tmp = [x.strip('(').strip(')') for x in line.split()]
+            if len(tmp) == 0:
+                continue
+            elif tmp[0] == '#':
+                continue
+            elif len(tmp) != 10:
+                continue
+            else:
+                if float(tmp[0]) < startTime:
+                    continue
+                elif float(tmp[0]) > endTime:
+                    break
+                else:
+                # [float(i) for i in lst]
+                # raw.append(list(map(float, tmp)))
+                    try:
+                        raw.append([ float(i) for i in tmp ])
+                    except ValueError:
+                        print("could not convert string to float in line:")
+                        print("\t" + line)
+                        print("in file:")
+                        print("\t" + filepath)
+
+    filehandle.close()
+    raw = np.array(raw).T
+    return raw
+
+
 
 ## simple hann window filter
 # TODO does not work properly on numpy arrays, needs to be improved
