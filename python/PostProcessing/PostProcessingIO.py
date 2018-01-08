@@ -6,6 +6,8 @@ from os import listdir
 # import matplotlib.pyplot as plt
 import math
 
+toCoefficient = lambda rho, u, A: 0.5*rho*(u**2)*A
+
 def isNumber(s):
     try:
         complex(s) # for int, long, float and complex
