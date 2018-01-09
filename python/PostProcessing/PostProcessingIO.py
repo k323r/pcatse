@@ -63,8 +63,22 @@ def readLine(line):
 
     return elements
     
+def readFile(filepath):
+    try:
+        with open(filepath, 'r') as f:
+            raw = []
+            for line in f:
+                data = readLine(line)
+                if data != None and len(data) > 1:
+                    raw.append(data)
+            return np.array(raw)
+            
+    except (IOError, OSError) as e:
+        print("An Error occured while trying to read file {}".format(filepath))
+        print("error({0}): {1}".format(e.errno, e.strerror))
+    
 
-def readFile(filepath, startTime = 0.1, endTime = 10, timeAxis = 0):
+def readTimeFile(filepath, startTime = 0.1, endTime = 10, timeAxis = 0):
     
     try:
         filehandle = open(filepath, 'r')

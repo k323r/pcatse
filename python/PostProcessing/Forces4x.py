@@ -4,7 +4,6 @@ from glob import glob as glob
 from PostProcessingIO import isNumber, fftAnalysis, filterData, toCoefficient
 from collections import defaultdict
 
-# TODO add filter wrapper
 # TODO add fft analysis (probably need reimplementation)
 
 class Forces:
@@ -41,7 +40,7 @@ class Forces:
                         self._rawForces.append(self._readForceFile(path.join(timeDir, "forces.dat")))
                 
                 ### generate a numpy matrix containing all forces
-                self._rawForces = np.concatenate((self._rawForces), dtype="float64")
+                self._rawForces = np.concatenate((self._rawForces))
                 ### sort the matrix by sorting after the first column (time)
                 self._rawForces = self._rawForces[self._rawForces[:,0].argsort()]
             
