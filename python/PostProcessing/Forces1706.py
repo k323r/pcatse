@@ -1,7 +1,7 @@
 import os.path as path
 import numpy as np
 from glob import glob as glob
-from PostProcessingIO import isNumber
+from PostProcessingIO import isNumber, fftAnalysis, filterData, toCoefficient
 from collections import defaultdict
 
 
@@ -18,7 +18,7 @@ class Forces:
     _VISCOUS_Y = 8
     _VISCOUS_Z = 9
 
-    def __init__(self, inputpath, average = True, FFT = False, verbose = True):
+    def __init__(self, inputpath, average = False, FFT = False, verbose = True):
     
         self._inputpath = inputpath
         self._verbose = verbose
@@ -47,7 +47,7 @@ class Forces:
             # build a "nice" dict with the forces                    
             pos = iter(range(1,10))
             self.forces = {}
-            self.forces["time"] = self._rawForces[:,0]
+            self.forces["time"] = self._rawForces[:,self._TIME]
             for forceType in ("total", "pressure", "viscous"):
                 self.forces[forceType] = {}
                 for component in "x", "y", "z":
@@ -114,12 +114,12 @@ class Forces:
         self.averageForces = {}
         self.stdForces = {}
         
-        startIndex, endIndex = getIndices(startTime, endTime)
+        startIndex, endIndex = self._getIndices(startTime, endTime)
 
         for forceType in ("total", "pressure", "viscous"):
             self.averageForces[forceType] = {}
             self.stdForces[forceType] = {}
-            for component in "x", "y", "z":
+            for component in ("x", "y", "z"):
                 self.averageForces[forceType][component] = np.average(self.forces[forceType][component][startIndex:endIndex])
                 self.stdForces[forceType][component] = np.std(self.forces[forceType][component][startIndex:endIndex])
             
@@ -130,12 +130,54 @@ class Forces:
         if self._verbose == True:
             print(message)
     
-    def getMaxTime(self)
+    def getMaxTime(self):
         self._verbosePrint("max time is {}".format(self.forces["time"][-1]))
         return self.forces["time"][-1]
+        
+        
+    def filterForces(self, startTime = 0, endTime = 0, filterFunction = "flat", filterWindow = 11):
+        if filterWindow % 2 == 0:
+            raise Exception("filterWindow needs to be an uneven number!")
+
+        startIndex, endIndex = self._getIndices(startTime, endTime)
+        endTimeIndex = int(len(self._rawForces[:,self._TIME]) - ((filterWindow - 1)/2))
+
+        self.filteredForces = {}
+        
+        self.filteredForces["time"] =  self._rawForces[int((filterWindow - 1)/2):endTimeIndex,self._TIME]
+        
+        for forceType in ("total", "pressure", "viscous"):
+            self.filteredForces[forceType] = {}
+            for component in ("x", "y", "z"):
+                self.filteredForces[forceType][component] = filterData(self.forces[forceType][component][startIndex:endIndex], filterWindow, filterFunction)
+        
+        return self.filteredForces
+    
+    def calculateFilteredAveragesStd(self, startTime = 0, endTime = 0):
+        
+        if hasattr(self, "filteredForces") == False:
+            raise Exception("missing attribute filteredForces. Please run filterForces prior to calculateFilteredAveragesStd!")
+        
+        self.averageFilteredForces = {}
+        self.stdFilteredForces = {}
+        
+        startIndex, endIndex = self._getIndices(startTime, endTime)
+
+        for forceType in ("total", "pressure", "viscous", "porous"):
+            self.averageFilteredForces[forceType] = {}
+            self.stdFilteredForces[forceType] = {}
+            for component in ("x", "y", "z"):
+                self.averageFilteredForces[forceType][component] = np.average(self.filteredForces[forceType][component][startIndex:endIndex])
+                self.stdFilteredForces[forceType][component] = np.std(self.filteredForces[forceType][component][startIndex:endIndex])
+            
+        return (self.averageFilteredForces, self.stdFilteredForces)
+    
+    def getMinTime(self):
+        self._verbosePrint("min time is {}".format(self.forces["time"][0]))
+        return self.forces["time"][0]
     
     ## define a method for getting forces by time
-    def getForcesByTime(self,  startTime = 0, endTime = 0, forceType = "total", forceComponent = "x"):
+    def getForceByTime(self,  startTime = 0, endTime = 0, forceType = "total", forceComponent = "x"):
         startIndex, endIndex = getIndices(startTime, endTime)
         return self.forces[forceType][forceComponent][startIndex:endIndex]
 

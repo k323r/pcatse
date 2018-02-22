@@ -182,8 +182,10 @@ class Forces:
     def getForceByTime(self,  startTime = 0, endTime = 0, forceType = "total", forceComponent = "x"):
         startIndex, endIndex = getIndices(startTime, endTime)
         return self.forces[forceType][forceComponent][startIndex:endIndex]
-    
-    
+
+    def _verbosePrint(self, message):
+        if self._verbose == True:
+            print(message)
             
 class ForceCoefficients(Forces):
     def __init__(self, inputpath, rho = 1, velocity = 1, area = 2, average = False, FFT = False, verbose = True):
