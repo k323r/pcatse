@@ -35,8 +35,11 @@ class Forces:
                 for timeDir in glob(path.join(inputpath, "*")):
                     if isNumber(timeDir.split("/")[-1]):
                         self._verbosePrint("processing time dir {}".format(timeDir))
-                        self._timeDirs.append(timeDir)                        
-                        self._rawForces.append(self._readForceFile(path.join(timeDir, "force.dat")))
+                        self._timeDirs.append(timeDir)
+                        # get the force files
+                        for forcefile in glob(path.join(timeDir, "force*.dat")):
+                            self._verbosePrint("processing: {}".format(forcefile))
+                            self._rawForces.append(self._readForceFile(forcefile))
                 
                 ### generate a numpy matrix containing all forces
                 self._rawForces = np.concatenate((self._rawForces))
@@ -96,17 +99,21 @@ class Forces:
         startIndex = 0
         endIndex = len(self.forces["time"])
         if startTime == 0 and endTime == 0:
-            pass        
-        elif startTime > 0 and endTime > 0 and startTime > endTime:
-            self._verbosePrint("start time > end time, setting end time to max time: {}".format(self._rawForces[-1,self._TIME]))                  
+            self._verbosePrint("start index {} end index {}".format(startIndex, endIndex))        
+        elif startTime > 0 and endTime == 0:                  
             startIndex = self._getTimeIndex(startTime)
+            self._verbosePrint("start index {} end index {}".format(startIndex, endIndex))
         elif startTime == 0 and endTime > 0:
-            self._verbosePrint("start time is set to zero!")
-            endIndex = self._getTimeIndex(endTime)
-        else:
+            endIndex = self._getTimeIndex(endTime)            
+            self._verbosePrint("start index {} end index {}".format(startIndex, endIndex))
+        elif startTime > 0 and endTime > 0:
             startIndex = self._getTimeIndex(startTime)
             endIndex = self._getTimeIndex(endTime)
-            self._verbosePrint("start time set to {} and end time set to {}".format(startIndex, endIndex))
+            self._verbosePrint("start index {} end index {}".format(startIndex, endIndex))
+        else:
+            print("undefined behaviour!")
+            startIndex=0
+            endIndex=0
         return (startIndex, endIndex)
     
     def calculateAveragesStd(self, startTime = 0, endTime = 0):
