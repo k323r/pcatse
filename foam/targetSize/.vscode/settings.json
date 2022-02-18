@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "Test-vector.C": "cpp",
+        "targetSize.C": "cpp",
+        "targetSizeTemplates.C": "cpp",
+        "atomic": "cpp",
+        "regionFunctionObjectTemplates.C": "cpp",
+        "fieldExpressionTemplates.C": "cpp",
+        "messageStream.C": "cpp",
+        "fieldExpression.C": "cpp",
+        "timeControlFunctionObject.C": "cpp",
+        "functionObjectList.C": "cpp",
+        "Time.C": "cpp",
+        "pimpleFoam.C": "cpp"
+    },
+    "C_Cpp.intelliSenseEngine": "Tag Parser"
+}

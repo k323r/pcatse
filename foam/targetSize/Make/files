@@ -1,0 +1,3 @@
+targetSize.C
+
+LIB = $(FOAM_USER_LIBBIN)/libtargetSize
