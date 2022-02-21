@@ -118,8 +118,11 @@ class targetSize
         template<class Type>
         bool calctargetSize();
 
-        //- Calculate the targetSizeient field and return true if successful
+        //- Calculate the targetSizeField field and return true if successful
         virtual bool calc();
+
+        //- Get or initialize the targetSizeField
+        volScalarField& getOrInitializeSizeField();
 
 
 public:

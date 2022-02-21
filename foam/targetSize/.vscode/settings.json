@@ -11,7 +11,10 @@
         "timeControlFunctionObject.C": "cpp",
         "functionObjectList.C": "cpp",
         "Time.C": "cpp",
-        "pimpleFoam.C": "cpp"
+        "pimpleFoam.C": "cpp",
+        "primitiveMeshCellCells.C": "cpp",
+        "fvcGrad.C": "cpp",
+        "facGrad.C": "cpp"
     },
     "C_Cpp.intelliSenseEngine": "Tag Parser"
 }

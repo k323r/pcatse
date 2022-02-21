@@ -28,6 +28,9 @@ License
 
 #include "targetSize.H"
 #include "addToRunTimeSelectionTable.H"
+#include "fvcGrad.H"
+#include "fvCFD.H"
+#include "volFields.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -42,16 +45,95 @@ namespace functionObjects
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+Foam::volScalarField& Foam::functionObjects::targetSize::getOrInitializeSizeField()
+{
+    if (!foundObject<volScalarField>(resultName_))
+    {
+        auto tfldPtr = tmp<volScalarField>::New
+        (
+            IOobject
+            (
+                resultName_,
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::MUST_READ,
+                IOobject::AUTO_WRITE
+            ),
+            mesh_
+        );
+        store(resultName_, tfldPtr);
+    }
+
+    return lookupObjectRef<volScalarField>(resultName_);
+}
+
 
 bool Foam::functionObjects::targetSize::calc()
 {
-    bool processed = false;
+    //bool processed = false;
 
-    processed = processed || calctargetSize<scalar>();
-    processed = processed || calctargetSize<vector>();
+    //processed = processed || calctargetSize<scalar>();
+    //processed = processed || calctargetSize<vector>();
 
-    Info << "Ran targetSize::calc()" << endl;
-    return processed;
+
+    // This has to be changed to be adaptable to scalar and vector field
+    //volScalarField St = 
+    //Foam::tmp<volScalarField>::New
+
+
+    volScalarField& St = getOrInitializeSizeField();
+
+    volTensorField uGrad = fvc::grad(lookupObject<volVectorField>(fieldName_));
+
+    vector dist;
+
+    // Iterate over all mesh cell labels
+    forAll(mesh_.C(), cellI)
+    {
+        // For current cell, get List of neighbourCells
+        const Foam::labelList& neighBourCellLabels(mesh_.cellCells()[cellI]);
+
+        // Iterate over all 
+        forAll(neighBourCellLabels, neighbourI)
+        {
+            // Get (absolute) label/index of neighbour cell
+            label curNeighbour = mesh_.cellCells()[cellI][neighbourI];
+            dist = mesh_.C()[curNeighbour] - mesh_.C()[cellI];
+            vector h_hat_j = dist / mag(dist);
+            vector grad_at_C = h_hat_j & uGrad[cellI];
+            vector grad_at_F = h_hat_j & uGrad[curNeighbour];
+            St[cellI] = mag(grad_at_C - grad_at_F);
+            //St[cellI] = Foam::mag((h_hat_j & uGrad[cellI]) - Foam::mag(h_hat_j & uGrad[curNeighbour]);
+            //auto sensor_value =  fvc::grad(lookupObject<volVectorField>(fieldName_))[curNeighbour] - fvc::grad(lookupObject<volVectorField>(fieldName_))[cellI]));
+        }
+    }
+/*
+    const bool isNew = false;
+
+    if (isNew)
+    {
+	    volScalarField St
+	    (
+		IOobject
+		(
+			resultName_,
+			mesh_.time().timeName(),
+			mesh_,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+	    mesh_
+	    );
+
+	    // value
+	    Info << "Ran targetSize::calc() successfully" << endl;
+    }
+    
+    //St = Foam::mag(fvc::grad(lookupObject<volVectorField>(fieldName_)));
+    //store(resultName_, St);
+    */
+    //return store(resultName_, St);
+    return true;
 }
 
 
@@ -65,7 +147,9 @@ Foam::functionObjects::targetSize::targetSize
 )
 :
     fieldExpression(name, runTime, dict)
-{}
+{
+    volScalarField& St = getOrInitializeSizeField();
+}
 
 
 // ************************************************************************* //
