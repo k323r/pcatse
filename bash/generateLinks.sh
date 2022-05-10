@@ -1,20 +1,20 @@
 #!/bin/bash
 
 counter=1
-timeDirPattern="10*.*"
+timeDirPattern="*.*"
 sourceFileName="U_zNormal.vtk"
 targetDirName=$(echo $sourceFileName | sed -s 's/\.vtk//')
 
 echo $targetDirName
 
-if [ -d sortedSurfaces/${targetDirName} ]
+if [ -d time-sorted/${targetDirName} ]
 then
-        if [ $(ls sortedSurfaces/${targetDirName}/*.vtk | wc -l) != 0 ]
+        if [ $(ls time-sorted/${targetDirName}/*.vtk | wc -l) != 0 ]
         then
-                rm sortedSurfaces/${targetDirName}/*.vtk
+                rm time-sorted/${targetDirName}/*.vtk
         fi
 else
-        mkdir -p sortedSurfaces/${targetDirName}
+        mkdir -p time-sorted/${targetDirName}
 fi
 
 for timeDir in sort -n $timeDirPattern
@@ -23,7 +23,7 @@ do
         then
             if [ -e ${timeDir}/${sourceFileName} ] && [ -f ${timeDir}/${sourceFileName} ]
             then
-            targetPath="sortedSurfaces/${targetDirName}/${targetDirName}_${counter}.vtk"
+            targetPath="time-sorted/${targetDirName}/${targetDirName}_${counter}.vtk"
             echo $targetPath
                     ln -s ../../${timeDir}/${sourceFileName} $targetPath
                     counter=$(($counter+1))
