@@ -3,6 +3,7 @@
 counter=1
 timeDirPattern="[1-9]*"
 sourceFileName=""
+baseTargetDir="time-sorted"
 
 
 if [ -z $1 ]
@@ -18,14 +19,14 @@ targetDirName=$(echo $sourceFileName | sed -s 's/\.vtp//')
 
 echo $targetDirName
 
-if [ -d sortedSurfaces/${targetDirName} ]
+if [ -d ${baseTargetDir}/${targetDirName} ]
 then
-        if [ $(ls sortedSurfaces/${targetDirName}/*.vtp | wc -l) != 0 ]
+        if [ $(ls ${baseTargetDir}/${targetDirName}/*.vtp | wc -l) != 0 ]
         then
-                rm sortedSurfaces/${targetDirName}/*.vtp
+                rm ${baseTargetDir}/${targetDirName}/*.vtp
         fi
 else
-        mkdir -p sortedSurfaces/${targetDirName}
+        mkdir -p ${baseTargetDir}/${targetDirName}
 fi
 
 for timeDir in sort -n $timeDirPattern
@@ -34,7 +35,7 @@ do
         then
             if [ -e ${timeDir}/${sourceFileName} ] && [ -f ${timeDir}/${sourceFileName} ]
             then
-            targetPath="sortedSurfaces/${targetDirName}/${targetDirName}_${counter}.vtp"
+            targetPath="${baseTargetDir}/${targetDirName}/${targetDirName}_${counter}.vtp"
             echo $targetPath
                     ln -s ../../${timeDir}/${sourceFileName} $targetPath
                     counter=$(($counter+1))
