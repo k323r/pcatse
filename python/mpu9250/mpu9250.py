@@ -140,7 +140,7 @@ class MPU9250:
             datetime.fromtimestamp(self._time_unixtime, tz=timezone.utc),
             self._time_unixtime,
             self._time_uptime,
-            self._read_temperature,
+            self._temperature,
             *self._linear_acceleration,
             *self._rotational_acceleration,
             *self._magnetic_field,
