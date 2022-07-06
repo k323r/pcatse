@@ -141,9 +141,9 @@ class MPU9250:
             self._time_unixtime,
             self._time_uptime,
             self._temperature,
-            *self._linear_acceleration,
-            *self._rotational_acceleration,
-            *self._magnetic_field,
+            *[x for _, x in self._linear_acceleration.items()],
+            *[x for _, x in self._rotational_acceleration.items()],
+            *[x for _, x in self._magnetic_field.items()],
         ]
         # return {
         #    'timestamp'                  : self._time_unixtime,
