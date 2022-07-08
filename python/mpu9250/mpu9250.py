@@ -5,6 +5,7 @@
 import smbus
 import time
 import uptime
+import signal
 from datetime import datetime, timezone
 
 ## MPU9250 Default I2C slave address
@@ -347,8 +348,11 @@ class MPU9250:
         self._time_unixtime = time.time()
         self._time_uptime = uptime.uptime()
 
+def signal_handler(frame):
+    sys.exit(0)
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal_handler)
     mpu = MPU9250()
     delta_t = 0.02
     while True:
