@@ -348,7 +348,7 @@ class MPU9250:
         self._time_unixtime = time.time()
         self._time_uptime = uptime.uptime()
 
-def signal_handler():
+def signal_handler(sig_num, stack_frame):
     sys.exit(0)
 
 if __name__ == "__main__":
