@@ -2,11 +2,12 @@
 # - implement filter?
 # - implement producer/consumer pattern with multiprocessing?
 
+from datetime import datetime, timezone
+import signal
 import smbus
+import sys
 import time
 import uptime
-import signal
-from datetime import datetime, timezone
 
 ## MPU9250 Default I2C slave address
 SLAVE_ADDRESS = 0x68
