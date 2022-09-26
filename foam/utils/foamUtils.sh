@@ -5,15 +5,23 @@ function executionTime () {
   awk 'NR>1{print $3-old; old=$3}'
 }
 
+
 function linkVTPs () {
-  counter=0; for t in $(ls .. | sort -n)
+  counter=0; 
+  for t in $(ls .. | sort -n)
   do
+    echo $t
     if [[ "$t" == "timesorted" ]]
     then
       echo "skipping timesorted dir"
       continue
     fi
-    for f in ../"${t}"/*
+    if [[ -z "$( ls ../$t )" ]]
+    then
+      echo "skipping empty directory $t"
+      continue
+    fi
+    for f in ../"${t}"/*.vtp
     do
       name=$(basename ../"${t}"/"${f}" .vtp)
       ln -s ../"${t}"/"${f}" "${name}_${counter}.vtp"
@@ -21,6 +29,7 @@ function linkVTPs () {
     counter=$((counter += 1))
   done
 }
+
 
 function extractCentreOfMass () {
 	test -f $1 || echo "${1} no such file or directory"
