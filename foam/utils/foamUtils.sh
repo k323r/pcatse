@@ -6,7 +6,9 @@ function executionTime () {
 }
 
 function linkVTPs () {
-  counter=0; for t in $(ls .. | sort -n)
+  mkdir -p timesorted && cd timesorted
+  counter=0;
+  for t in $(ls .. | sort -n)
   do
     if [[ "$t" == "timesorted" ]]
     then
@@ -20,6 +22,7 @@ function linkVTPs () {
     done
     counter=$((counter += 1))
   done
+  cd ..
 }
 
 function extractCentreOfMass () {
